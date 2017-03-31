@@ -1,10 +1,10 @@
-const mongooes = require('mongoose');
+const mongoose = require('mongoose');
 
-mongooes.Promise = global.Promise;
+mongoose.Promise = global.Promise;
 
 before((done) => {
-  mongooes.connect('mongodb://localhost/user_test');
-  mongooes.connection
+  mongoose.connect('mongodb://localhost/user_test');
+  mongoose.connection
     .once('open', () => { done(); })
     .on('error', (error) => {
       console.warn(`Warning: ${error}`);
@@ -13,8 +13,12 @@ before((done) => {
 
 
   beforeEach((done) => {
-    mongooes.connection.collections.users.drop(() => {
-      // Ready to run next test
-      done();
+    const { users, comments, blogposts } = mongoose.connection.collections;
+    users.drop(() => {
+      comments.drop(() => {
+        blogposts.drop(() => {
+          done();
+        });
+      });
     });
   });
